@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Consultation – Dr. Rakhee E P</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    :root {
+      --primary: #00695c;
+      --primary-light: #e0f2f1;
+      --accent: #ffa000;
+      --text-main: #212121;
+      --text-muted: #616161;
+      --border: #e0e0e0;
+      --bg: #fafafa;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: var(--bg);
+      color: var(--text-main);
+    }
+
+    .page {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    header {
+      text-align: center;
+      padding: 12px 8px 20px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+
+    .title {
+      margin: 0;
+      font-size: 1.5rem;
+      color: var(--primary);
+    }
+
+    .subtitle {
+      margin: 4px 0;
+      font-size: 0.95rem;
+      color: var(--text-muted);
+    }
+
+    .tagline {
+      margin-top: 8px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--accent);
+    }
+
+    .availability-note {
+      margin: 8px auto 0;
+      max-width: 520px;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+
+    .section-title {
+      margin: 0 0 10px;
+      font-size: 1.1rem;
+    }
+
+    .section-subtitle {
+      margin: 0 0 8px;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .next-slots {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .slot-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--primary-light);
+    }
+
+    .slot-main {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .slot-day {
+      font-weight: 600;
+    }
+
+    .slot-date {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .slot-time {
+      font-weight: 500;
+      color: var(--primary);
+    }
+
+    .status-pill {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border: 1px solid var(--primary);
+      color: var(--primary);
+      background: #ffffff;
+      white-space: nowrap;
+    }
+
+    .status-pill.closed {
+      border-color: #d32f2f;
+      color: #d32f2f;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 8px 18px;
+      background: var(--primary);
+      color: #fff;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.16);
+    }
+
+    button:hover {
+      background: #004d40;
+    }
+
+    button:active {
+      transform: translateY(1px);
+      box-shadow: 0 0 0 rgba(0, 0, 0, 0.16);
+    }
+
+    button[aria-pressed="true"] {
+      background: var(--accent);
+    }
+
+    .icon {
+      font-size: 1rem;
+    }
+
+    .week-table-wrapper {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease;
+    }
+
+    .week-table-wrapper.open {
+      max-height: 500px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    th,
+    td {
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+
+    th {
+      background: #f5f5f5;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    tr.closed {
+      color: #9e9e9e;
+      background: #fafafa;
+    }
+
+    .pill-open,
+    .pill-closed {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border: 1px solid transparent;
+    }
+
+    .pill-open {
+      background: #e8f5e9;
+      color: #2e7d32;
+      border-color: #2e7d32;
+    }
+
+    .pill-closed {
+      background: #ffebee;
+      color: #c62828;
+      border-color: #c62828;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 8px;
+    }
+
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 8px;
+      padding: 10px 0 4px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .updated-time {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 6px;
+      text-align: right;
+    }
+
+    @media (min-width: 600px) {
+      header {
+        text-align: left;
+      }
+      .page {
+        padding: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <h1 class="title">Consultation Timings – Dr. Rakhee E P</h1>
+      <p class="subtitle">
+        Prasuti and Striroga Specialist, Government Ayurveda Hospital, Palakkad
+      </p>
+      <p class="tagline">Available 9:00 am – 2:00 pm (Tue, Wed, Thu, Sat, Sun)</p>
+      <p class="availability-note">
+        This page automatically shows the next two consultation days. Use the
+        button below to view the schedule for the entire week.
+      </p>
+    </header>
+
+    <main>
+      <section class="card" aria-label="Next two available days">
+        <h2 class="section-title">Next two available days</h2>
+        <p class="section-subtitle">
+          These are the upcoming consultation slots from today.
+        </p>
+        <div id="nextSlots" class="next-slots"></div>
+        <div class="updated-time" id="updatedTime"></div>
+      </section>
+
+      <section class="card" aria-label="Weekly consultation schedule">
+        <div class="controls">
+          <button id="toggleWeekBtn" type="button" aria-expanded="false" aria-pressed="false">
+            <span class="icon">📅</span>
+            <span id="toggleWeekLabel">Show full week</span>
+          </button>
+        </div>
+
+        <div id="weekWrapper" class="week-table-wrapper" aria-hidden="true">
+          <h2 class="section-title">Weekly schedule</h2>
+          <p class="section-subtitle">
+            Regular timings are fixed; changes, if any, will be notified at the hospital.
+          </p>
+
+          <div class="table-responsive">
+            <table aria-label="Weekly consultation time table">
+              <thead>
+                <tr>
+                  <th>Day</th>
+                  <th>Status</th>
+                  <th>Time</th>
+                  <th>Notes</th>
+                </tr>
+              </thead>
+              <tbody id="weekTableBody">
+                <!-- Filled by JavaScript -->
+              </tbody>
+            </table>
+          </div>
+
+          <div class="legend">
+            <span><span class="pill-open">Open</span> Consultation available</span>
+            <span><span class="pill-closed">Closed</span> No consultation</span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      Timings are indicative and subject to change as per hospital instructions.
+    </footer>
+  </div>
+
+  <script>
+    // Configuration for weekly schedule:
+    // 0 = Sunday, 1 = Monday, ... 6 = Saturday [web:15][web:6]
+    const CONSULT_DAYS = [0, 2, 3, 4, 6]; // Sun, Tue, Wed, Thu, Sat
+    const START_TIME = "9:00 am";
+    const END_TIME = "2:00 pm";
+
+    const DAY_NAMES = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ];
+
+    function pad2(n) {
+      return n.toString().padStart(2, "0");
+    }
+
+    function formatDateLabel(date) {
+      const d = date.getDate();
+      const m = date.getMonth() + 1;
+      const y = date.getFullYear();
+      return pad2(d) + "-" + pad2(m) + "-" + y;
+    }
+
+    function findNextConsultDays(fromDate, count) {
+      const result = [];
+      let cursor = new Date(fromDate.getTime());
+
+      while (result.length < count) {
+        const day = cursor.getDay();
+        if (CONSULT_DAYS.includes(day)) {
+          result.push(new Date(cursor.getTime()));
+        }
+        cursor.setDate(cursor.getDate() + 1);
+      }
+      return result;
+    }
+
+    function buildNextSlots() {
+      const container = document.getElementById("nextSlots");
+      container.innerHTML = "";
+
+      const now = new Date();
+      const upcoming = findNextConsultDays(now, 2);
+
+      upcoming.forEach((slotDate) => {
+        const dayName = DAY_NAMES[slotDate.getDay()];
+        const dateLabel = formatDateLabel(slotDate);
+
+        const slot = document.createElement("div");
+        slot.className = "slot-item";
+
+        const main = document.createElement("div");
+        main.className = "slot-main";
+
+        const dayEl = document.createElement("div");
+        dayEl.className = "slot-day";
+        dayEl.textContent = dayName;
+
+        const dateEl = document.createElement("div");
+        dateEl.className = "slot-date";
+        dateEl.textContent = dateLabel;
+
+        const timeEl = document.createElement("div");
+        timeEl.className = "slot-time";
+        timeEl.textContent = START_TIME + " – " + END_TIME;
+
+        main.appendChild(dayEl);
+        main.appendChild(dateEl);
+        main.appendChild(timeEl);
+
+        const status = document.createElement("div");
+        status.className = "status-pill";
+        status.textContent = "Open";
+
+        slot.appendChild(main);
+        slot.appendChild(status);
+        container.appendChild(slot);
+      });
+
+      const updatedEl = document.getElementById("updatedTime");
+      const timestamp =
+        pad2(now.getDate()) +
+        "-" +
+        pad2(now.getMonth() + 1) +
+        "-" +
+        now.getFullYear() +
+        " " +
+        pad2(now.getHours()) +
+        ":" +
+        pad2(now.getMinutes());
+      updatedEl.textContent = "Updated: " + timestamp;
+    }
+
+    function buildWeekTable() {
+      const tbody = document.getElementById("weekTableBody");
+      tbody.innerHTML = "";
+
+      for (let dayIndex = 0; dayIndex < 7; dayIndex++) {
+        const tr = document.createElement("tr");
+        const isOpen = CONSULT_DAYS.includes(dayIndex);
+
+        if (!isOpen) {
+          tr.classList.add("closed");
+        }
+
+        const dayCell = document.createElement("td");
+        dayCell.textContent = DAY_NAMES[dayIndex];
+
+        const statusCell = document.createElement("td");
+        const statusSpan = document.createElement("span");
+        statusSpan.className = isOpen ? "pill-open" : "pill-closed";
+        statusSpan.textContent = isOpen ? "Open" : "Closed";
+        statusCell.appendChild(statusSpan);
+
+        const timeCell = document.createElement("td");
+        timeCell.textContent = isOpen ? START_TIME + " – " + END_TIME : "—";
+
+        const notesCell = document.createElement("td");
+        notesCell.textContent = isOpen
+          ? "Consultation available at Government Ayurveda Hospital, Palakkad."
+          : "No regular consultation.";
+
+        tr.appendChild(dayCell);
+        tr.appendChild(statusCell);
+        tr.appendChild(timeCell);
+        tr.appendChild(notesCell);
+
+        tbody.appendChild(tr);
+      }
+    }
+
+    function initToggleWeek() {
+      const btn = document.getElementById("toggleWeekBtn");
+      const label = document.getElementById("toggleWeekLabel");
+      const wrapper = document.getElementById("weekWrapper");
+
+      btn.addEventListener("click", () => {
+        const isOpen = wrapper.classList.toggle("open");
+        wrapper.setAttribute("aria-hidden", String(!isOpen));
+        btn.setAttribute("aria-expanded", String(isOpen));
+        btn.setAttribute("aria-pressed", String(isOpen));
+        label.textContent = isOpen ? "Hide full week" : "Show full week";
+      });
+    }
+
+    function initPage() {
+      buildNextSlots();
+      buildWeekTable();
+      initToggleWeek();
+    }
+
+    document.addEventListener("DOMContentLoaded", initPage);
+  </script>
+</body>
+</html>
