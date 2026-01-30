@@ -1,10 +1,40 @@
-name: Weekly Sunday Update
+name: Update Schedule (Manual + Auto)
 
 on:
   schedule:
-    # Every Sunday at 9 AM UTC (2:30 PM IST) [web:31][web:33][web:39][web:41]
-    - cron: '0 9 * * 0'
-  workflow_dispatch:  # Allows manual trigger
+    - cron: '0 9 * * 0'  # Sunday 9AM UTC
+  workflow_dispatch:
+    inputs:
+      tue:
+        description: 'Tuesday (Tue): status'
+        required: false
+        default: 'OPEN'
+        type: choice
+        options: ['OPEN', 'CLOSED']
+      wed:
+        description: 'Wednesday (Wed)'
+        required: false
+        default: 'OPEN'
+        type: choice
+        options: ['OPEN', 'CLOSED']
+      thu:
+        description: 'Thursday (Thu)'
+        required: false
+        default: 'OPEN'
+        type: choice
+        options: ['OPEN', 'CLOSED']
+      sat:
+        description: 'Saturday (Sat)'
+        required: false
+        default: 'OPEN'
+        type: choice
+        options: ['OPEN', 'CLOSED']
+      sun:
+        description: 'Sunday (Sun)'
+        required: false
+        default: 'OPEN'
+        type: choice
+        options: ['OPEN', 'CLOSED']
 
 jobs:
   update:
@@ -12,12 +42,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Create/update timestamp file
+      - name: Set overrides from inputs
         run: |
-          echo "Last auto-update: $(date -u '+%Y-%m-%d %H:%M UTC')" > LAST_UPDATE.txt
+          OVERRIDES="{}"
+          if [ "${{ github.event.inputs.tue }}" != "OPEN" ]; then
+            OVERRIDES=$(jq --arg date "$(date -d 'tuesday' '+%Y-%m-%d')" --arg status "${{ github.event.inputs.tue }}" '$OVERRIDES + {($date): $status}' <<< "$OVERRIDES")
+          fi
+          # Repeat for wed, thu, sat, sun...
+          echo "$OVERRIDES" | jq > schedule.json
 
-      - name: Commit timestamp changes
+      - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "🤖 Auto-update timestamp [skip ci]"
-          file_pattern: LAST_UPDATE.txt
+          commit_message: "📅 Schedule update"
