@@ -1,3 +1,5 @@
+
+Made with Perplexity
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -343,72 +345,237 @@
   </div>
 
   <script>
-    // ... existing config (CONSULT_DAYS etc.)
+    // Configuration: Days when consultation is available (0=Sun, 1=Mon, ..., 6=Sat)
+    // Default schedule: Tue, Wed, Thu, Sat, Sun are open
+    const CONSULT_DAYS = [2, 3, 4, 6, 0]; // Tuesday, Wednesday, Thursday, Saturday, Sunday
 
-  let scheduleOverrides = {}; // Will load from JSON
-  
-  async function loadOverrides() {
-    try {
-      const response = await fetch('schedule.json?' + Date.now());
-      const data = await response.json();
-      scheduleOverrides = data.overrides || {};
-      console.log('Overrides loaded:', scheduleOverrides);
-    } catch (e) {
-      console.log('No overrides file or fetch failed, using defaults');
-    }
-  }
-  
-  function isDayOverridden(dateStr) { // YYYY-MM-DD
-    return scheduleOverrides[dateStr];
-  }
-  
-  function findNextConsultDays(fromDate, count) {
-    const result = [];
-    let cursor = new Date(fromDate.getTime());
-  
-    while (result.length < count) {
-      const day = cursor.getDay();
-      const dateStr = formatDateLabel(cursor);
-      
-      // Skip if overridden to CLOSED
-      if (scheduleOverrides[dateStr] === 'CLOSED') {
-        cursor.setDate(cursor.getDate() + 1);
-        continue;
+    // Time slots for consultation
+    const CONSULT_TIME = "9:00 AM – 1:00 PM";
+
+    // Day names
+    const DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const DAY_NAMES_SHORT = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+    let scheduleOverrides = {}; // Will load from JSON
+    let lastUpdated = null;
+
+    // Load overrides from JSON file
+    async function loadOverrides() {
+      try {
+        const response = await fetch('schedule.json?' + Date.now());
+        const data = await response.json();
+        scheduleOverrides = data.overrides || {};
+        lastUpdated = data.last_updated;
+        console.log('Overrides loaded:', scheduleOverrides);
+      } catch (e) {
+        console.log('No overrides file or fetch failed, using defaults');
       }
-      
-      if (CONSULT_DAYS.includes(day)) {
-        result.push(new Date(cursor.getTime()));
-      }
-      cursor.setDate(cursor.getDate() + 1);
     }
-    return result;
-  }
-  
-  // In buildWeekTable(): add override status
-  function buildWeekTable() {
-    // ... existing loop
-    const today = new Date();
-    const thisWeekStart = new Date(today);
-    thisWeekStart.setDate(today.getDate() - today.getDay()); // Sunday start
-    
-    for (let dayIndex = 0; dayIndex < 7; dayIndex++) {
-      const date = new Date(thisWeekStart.getTime() + dayIndex * 86400000);
+
+    // Format date as YYYY-MM-DD
+    function formatDateLabel(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    // Format date for display
+    function formatDateDisplay(date) {
+      const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+    }
+
+    // Check if a specific date is overridden
+    function isDayOverridden(dateStr) {
+      return scheduleOverrides.hasOwnProperty(dateStr);
+    }
+
+    // Check if a day is open for consultation
+    function isDayOpen(date) {
       const dateStr = formatDateLabel(date);
-      const isOpen = CONSULT_DAYS.includes(dayIndex) && !isDayOverridden(dateStr);
-      
-      // ... rest same, but status shows override if present
-      statusSpan.textContent = isOpen ? "Open" : (scheduleOverrides[dateStr] || "Closed");
-      if (scheduleOverrides[dateStr]) statusSpan.title = `Override: ${scheduleOverrides[dateStr]}`;
+      const dayOfWeek = date.getDay();
+
+      // Check if explicitly overridden
+      if (isDayOverridden(dateStr)) {
+        return scheduleOverrides[dateStr] === 'OPEN';
+      }
+
+      // Otherwise use default schedule
+      return CONSULT_DAYS.includes(dayOfWeek);
     }
-  }
-  
-  // Update initPage():
-  async function initPage() {
-    await loadOverrides();
-    await buildNextSlots();
-    buildWeekTable();
-    initToggleWeek();
-  }
-</script>
+
+    // Find next N consultation days from a given date
+    function findNextConsultDays(fromDate, count) {
+      const result = [];
+      let cursor = new Date(fromDate.getTime());
+      let maxIterations = 30; // Safety limit
+
+      while (result.length < count && maxIterations > 0) {
+        if (isDayOpen(cursor)) {
+          result.push(new Date(cursor.getTime()));
+        }
+        cursor.setDate(cursor.getDate() + 1);
+        maxIterations--;
+      }
+      return result;
+    }
+
+    // Build the "Next two available days" section
+    async function buildNextSlots() {
+      const container = document.getElementById('nextSlots');
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const nextDays = findNextConsultDays(today, 2);
+
+      container.innerHTML = '';
+
+      if (nextDays.length === 0) {
+        container.innerHTML = '<p>No upcoming consultations scheduled.</p>';
+        return;
+      }
+
+      nextDays.forEach(date => {
+        const slotItem = document.createElement('div');
+        slotItem.className = 'slot-item';
+
+        const slotMain = document.createElement('div');
+        slotMain.className = 'slot-main';
+
+        const slotDay = document.createElement('div');
+        slotDay.className = 'slot-day';
+        slotDay.textContent = DAY_NAMES[date.getDay()];
+
+        const slotDate = document.createElement('div');
+        slotDate.className = 'slot-date';
+        slotDate.textContent = formatDateDisplay(date);
+
+        const slotTime = document.createElement('div');
+        slotTime.className = 'slot-time';
+        slotTime.textContent = CONSULT_TIME;
+
+        slotMain.appendChild(slotDay);
+        slotMain.appendChild(slotDate);
+        slotMain.appendChild(slotTime);
+
+        const statusPill = document.createElement('span');
+        statusPill.className = 'status-pill';
+        statusPill.textContent = 'Open';
+
+        slotItem.appendChild(slotMain);
+        slotItem.appendChild(statusPill);
+        container.appendChild(slotItem);
+      });
+
+      // Update last updated time
+      const updatedTimeEl = document.getElementById('updatedTime');
+      if (lastUpdated) {
+        updatedTimeEl.textContent = `Last updated: ${lastUpdated}`;
+      } else {
+        updatedTimeEl.textContent = '';
+      }
+    }
+
+    // Build the weekly schedule table
+    function buildWeekTable() {
+      const tbody = document.getElementById('weekTableBody');
+      tbody.innerHTML = '';
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      // Start from current week's Sunday
+      const thisWeekStart = new Date(today);
+      thisWeekStart.setDate(today.getDate() - today.getDay());
+
+      for (let dayIndex = 0; dayIndex < 7; dayIndex++) {
+        const date = new Date(thisWeekStart);
+        date.setDate(thisWeekStart.getDate() + dayIndex);
+        const dateStr = formatDateLabel(date);
+        const isOpen = isDayOpen(date);
+
+        const row = document.createElement('tr');
+        if (!isOpen) {
+          row.className = 'closed';
+        }
+
+        // Day column
+        const dayCell = document.createElement('td');
+        dayCell.textContent = DAY_NAMES[dayIndex];
+        row.appendChild(dayCell);
+
+        // Status column
+        const statusCell = document.createElement('td');
+        const statusSpan = document.createElement('span');
+        statusSpan.className = isOpen ? 'pill-open' : 'pill-closed';
+        statusSpan.textContent = isOpen ? 'Open' : 'Closed';
+
+        if (isDayOverridden(dateStr)) {
+          statusSpan.title = `Override: ${scheduleOverrides[dateStr]}`;
+        }
+
+        statusCell.appendChild(statusSpan);
+        row.appendChild(statusCell);
+
+        // Time column
+        const timeCell = document.createElement('td');
+        timeCell.textContent = isOpen ? CONSULT_TIME : '—';
+        row.appendChild(timeCell);
+
+        // Notes column
+        const notesCell = document.createElement('td');
+        if (isDayOverridden(dateStr)) {
+          notesCell.textContent = 'Schedule modified';
+          notesCell.style.fontStyle = 'italic';
+        } else {
+          notesCell.textContent = '—';
+        }
+        row.appendChild(notesCell);
+
+        tbody.appendChild(row);
+      }
+    }
+
+    // Toggle week view
+    function initToggleWeek() {
+      const btn = document.getElementById('toggleWeekBtn');
+      const wrapper = document.getElementById('weekWrapper');
+      const label = document.getElementById('toggleWeekLabel');
+
+      btn.addEventListener('click', () => {
+        const isExpanded = btn.getAttribute('aria-expanded') === 'true';
+
+        if (isExpanded) {
+          wrapper.classList.remove('open');
+          wrapper.setAttribute('aria-hidden', 'true');
+          btn.setAttribute('aria-expanded', 'false');
+          btn.setAttribute('aria-pressed', 'false');
+          label.textContent = 'Show full week';
+        } else {
+          wrapper.classList.add('open');
+          wrapper.setAttribute('aria-hidden', 'false');
+          btn.setAttribute('aria-expanded', 'true');
+          btn.setAttribute('aria-pressed', 'true');
+          label.textContent = 'Hide full week';
+        }
+      });
+    }
+
+    // Initialize page
+    async function initPage() {
+      await loadOverrides();
+      await buildNextSlots();
+      buildWeekTable();
+      initToggleWeek();
+    }
+
+    // Run on page load
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initPage);
+    } else {
+      initPage();
+    }
+  </script>
 </body>
 </html>
