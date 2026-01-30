@@ -1,0 +1,23 @@
+name: Weekly Sunday Update
+
+on:
+  schedule:
+    # Every Sunday at 9 AM UTC (2:30 PM IST) [web:31][web:33][web:39][web:41]
+    - cron: '0 9 * * 0'
+  workflow_dispatch:  # Allows manual trigger
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create/update timestamp file
+        run: |
+          echo "Last auto-update: $(date -u '+%Y-%m-%d %H:%M UTC')" > LAST_UPDATE.txt
+
+      - name: Commit timestamp changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "🤖 Auto-update timestamp [skip ci]"
+          file_pattern: LAST_UPDATE.txt
