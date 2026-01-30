@@ -297,7 +297,7 @@
           These are the upcoming consultation slots from today.
         </p>
         <div id="nextSlots" class="next-slots"></div>
-        <div class="updated-time" id="updatedTime"></div>
+        <div class="updated-time" id="updatedTime">Loading last update...</div>
       </section>
 
       <section class="card" aria-label="Weekly consultation schedule">
@@ -344,20 +344,18 @@
   </div>
 
   <script>
-    // Configuration for weekly schedule:
-    // 0 = Sunday, 1 = Monday, ... 6 = Saturday [web:15][web:6]
+    // 🔥 IMPORTANT: UPDATE THESE TWO LINES WITH YOUR ACTUAL GITHUB USERNAME & REPO NAME
+    const GITHUB_USER = 'rakheeep';      // e.g., 'johndoe'
+    const GITHUB_REPO = 'dr-rakhee-consultation';    // e.g., 'dr-rakhee-consultation'
+
+    // Configuration for weekly schedule: 0=Sun,1=Mon,...,6=Sat
     const CONSULT_DAYS = [0, 2, 3, 4, 6]; // Sun, Tue, Wed, Thu, Sat
     const START_TIME = "9:00 am";
     const END_TIME = "2:00 pm";
 
     const DAY_NAMES = [
-      "Sunday",
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday",
+      "Sunday", "Monday", "Tuesday", "Wednesday", 
+      "Thursday", "Friday", "Saturday"
     ];
 
     function pad2(n) {
@@ -368,7 +366,7 @@
       const d = date.getDate();
       const m = date.getMonth() + 1;
       const y = date.getFullYear();
-      return pad2(d) + "-" + pad2(m) + "-" + y;
+      return `${pad2(d)}-${pad2(m)}-${y}`;
     }
 
     function findNextConsultDays(fromDate, count) {
@@ -385,7 +383,30 @@
       return result;
     }
 
-    function buildNextSlots() {
+    async function fetchLastCommitDate() {
+      try {
+        const response = await fetch(
+          `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}`
+        );
+        if (!response.ok) throw new Error('API failed');
+        const repo = await response.json();
+        const lastUpdated = new Date(repo.pushed_at);
+        return lastUpdated.toLocaleString('en-IN', { 
+          timeZone: 'Asia/Kolkata',
+          weekday: 'short', 
+          year: 'numeric', 
+          month: 'short', 
+          day: 'numeric', 
+          hour: '2-digit', 
+          minute: '2-digit'
+        });
+      } catch (e) {
+        console.error('GitHub API fetch failed:', e);
+        return null;
+      }
+    }
+
+    async function buildNextSlots() {
       const container = document.getElementById("nextSlots");
       container.innerHTML = "";
 
@@ -412,7 +433,7 @@
 
         const timeEl = document.createElement("div");
         timeEl.className = "slot-time";
-        timeEl.textContent = START_TIME + " – " + END_TIME;
+        timeEl.textContent = `${START_TIME} – ${END_TIME}`;
 
         main.appendChild(dayEl);
         main.appendChild(dateEl);
@@ -427,18 +448,19 @@
         container.appendChild(slot);
       });
 
+      // Show GitHub last commit + local refresh time
       const updatedEl = document.getElementById("updatedTime");
-      const timestamp =
-        pad2(now.getDate()) +
-        "-" +
-        pad2(now.getMonth() + 1) +
-        "-" +
-        now.getFullYear() +
-        " " +
-        pad2(now.getHours()) +
-        ":" +
-        pad2(now.getMinutes());
-      updatedEl.textContent = "Updated: " + timestamp;
+      const localTime = now.toLocaleString('en-IN', { 
+        timeZone: 'Asia/Kolkata',
+        hour: '2-digit', 
+        minute: '2-digit'
+      });
+      const ghDate = await fetchLastCommitDate();
+      if (ghDate) {
+        updatedEl.innerHTML = `Last updated: ${ghDate} (Refreshed: ${localTime} IST)`;
+      } else {
+        updatedEl.textContent = `Page refreshed: ${localTime} IST`;
+      }
     }
 
     function buildWeekTable() {
@@ -463,7 +485,7 @@
         statusCell.appendChild(statusSpan);
 
         const timeCell = document.createElement("td");
-        timeCell.textContent = isOpen ? START_TIME + " – " + END_TIME : "—";
+        timeCell.textContent = isOpen ? `${START_TIME} – ${END_TIME}` : "—";
 
         const notesCell = document.createElement("td");
         notesCell.textContent = isOpen
@@ -493,8 +515,8 @@
       });
     }
 
-    function initPage() {
-      buildNextSlots();
+    async function initPage() {
+      await buildNextSlots();
       buildWeekTable();
       initToggleWeek();
     }
