@@ -1,5 +1,4 @@
 
-Made with Perplexity
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,6 +15,10 @@ Made with Perplexity
       --text-muted: #616161;
       --border: #e0e0e0;
       --bg: #fafafa;
+      --open-bg: #e8f5e9;
+      --open-border: #4caf50;
+      --closed-bg: #ffebee;
+      --closed-border: #f44336;
     }
 
     * {
@@ -55,13 +58,6 @@ Made with Perplexity
       color: var(--text-muted);
     }
 
-    .tagline {
-      margin-top: 8px;
-      font-size: 0.95rem;
-      font-weight: 500;
-      color: var(--accent);
-    }
-
     .availability-note {
       margin: 8px auto 0;
       max-width: 520px;
@@ -84,7 +80,7 @@ Made with Perplexity
     }
 
     .section-subtitle {
-      margin: 0 0 8px;
+      margin: 0 0 12px;
       font-size: 0.9rem;
       color: var(--text-muted);
     }
@@ -138,119 +134,136 @@ Made with Perplexity
       white-space: nowrap;
     }
 
-    .status-pill.closed {
-      border-color: #d32f2f;
-      color: #d32f2f;
+    /* Calendar Grid Styles */
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
     }
 
-    .controls {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 12px;
+    .calendar-day {
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+      transition: transform 0.2s, box-shadow 0.2s;
+      position: relative;
     }
 
-    button {
-      border: none;
-      border-radius: 999px;
-      padding: 8px 18px;
-      background: var(--primary);
-      color: #fff;
-      font-size: 0.9rem;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.16);
+    .calendar-day:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 
-    button:hover {
-      background: #004d40;
+    .calendar-day.open {
+      background: var(--open-bg);
+      border-color: var(--open-border);
     }
 
-    button:active {
-      transform: translateY(1px);
-      box-shadow: 0 0 0 rgba(0, 0, 0, 0.16);
+    .calendar-day.closed {
+      background: var(--closed-bg);
+      border-color: var(--closed-border);
+      opacity: 0.7;
     }
 
-    button[aria-pressed="true"] {
-      background: var(--accent);
+    .calendar-day.today {
+      border-width: 3px;
+      box-shadow: 0 0 0 2px rgba(255, 160, 0, 0.2);
     }
 
-    .icon {
-      font-size: 1rem;
+    .day-name {
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin-bottom: 4px;
+      color: var(--text-main);
     }
 
-    .week-table-wrapper {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.35s ease;
+    .day-date {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 6px 0;
+      color: var(--text-main);
     }
 
-    .week-table-wrapper.open {
-      max-height: 500px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.9rem;
-    }
-
-    th,
-    td {
-      padding: 8px 10px;
-      border-bottom: 1px solid var(--border);
-      text-align: left;
-    }
-
-    th {
-      background: #f5f5f5;
-      font-weight: 600;
-      font-size: 0.9rem;
-    }
-
-    tr.closed {
-      color: #9e9e9e;
-      background: #fafafa;
-    }
-
-    .pill-open,
-    .pill-closed {
-      display: inline-block;
-      padding: 3px 10px;
-      border-radius: 999px;
+    .day-month {
       font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .day-status {
+      font-size: 0.75rem;
       font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.04em;
-      border: 1px solid transparent;
+      letter-spacing: 0.05em;
+      padding: 4px 8px;
+      border-radius: 4px;
+      display: inline-block;
+      margin-top: 6px;
     }
 
-    .pill-open {
-      background: #e8f5e9;
-      color: #2e7d32;
-      border-color: #2e7d32;
+    .calendar-day.open .day-status {
+      background: #4caf50;
+      color: white;
     }
 
-    .pill-closed {
-      background: #ffebee;
-      color: #c62828;
-      border-color: #c62828;
+    .calendar-day.closed .day-status {
+      background: #f44336;
+      color: white;
+    }
+
+    .day-time {
+      font-size: 0.8rem;
+      color: var(--text-main);
+      margin-top: 6px;
+      font-weight: 500;
+    }
+
+    .override-badge {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      background: var(--accent);
+      color: white;
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 600;
     }
 
     .legend {
       display: flex;
       flex-wrap: wrap;
-      gap: 12px;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      margin-top: 8px;
+      gap: 16px;
+      justify-content: center;
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
     }
 
-    .legend span {
-      display: inline-flex;
+    .legend-item {
+      display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
+      font-size: 0.85rem;
+    }
+
+    .legend-box {
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+      border: 2px solid;
+    }
+
+    .legend-box.open {
+      background: var(--open-bg);
+      border-color: var(--open-border);
+    }
+
+    .legend-box.closed {
+      background: var(--closed-bg);
+      border-color: var(--closed-border);
     }
 
     footer {
@@ -275,6 +288,9 @@ Made with Perplexity
       .page {
         padding: 24px;
       }
+      .calendar-grid {
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      }
     }
   </style>
 </head>
@@ -283,57 +299,41 @@ Made with Perplexity
     <header>
       <h1 class="title">Consultation Timings – Dr. Rakhee E P</h1>
       <p class="subtitle">
-        Prasuti and Striroga Specialist, District Ayurveda Hospital, Palakkad
-      </p></p>
+        Prasuti and Striroga Specialist, Government Ayurveda Hospital, Palakkad
+      </p>
       <p class="availability-note">
-        This page automatically shows the next two consultation days. Use the
-        button below to view the schedule for the entire week.
+        View upcoming consultation days for the rest of this week. Available and closed days are color-coded for easy reference.
       </p>
     </header>
 
     <main>
       <section class="card" aria-label="Next two available days">
-        <h2 class="section-title">Next two available days</h2>
+        <h2 class="section-title">Next two available consultations</h2>
         <p class="section-subtitle">
-          These are the upcoming consultation slots from today.
+          These are your upcoming consultation slots.
         </p>
         <div id="nextSlots" class="next-slots"></div>
         <div class="updated-time" id="updatedTime">Loading last update...</div>
       </section>
 
-      <section class="card" aria-label="Weekly consultation schedule">
-        <div class="controls">
-          <button id="toggleWeekBtn" type="button" aria-expanded="false" aria-pressed="false">
-            <span class="icon">📅</span>
-            <span id="toggleWeekLabel">Show full week</span>
-          </button>
+      <section class="card" aria-label="Remaining week schedule">
+        <h2 class="section-title">This week's schedule</h2>
+        <p class="section-subtitle">
+          Showing all remaining days from today onwards.
+        </p>
+
+        <div id="calendarGrid" class="calendar-grid">
+          <!-- Filled by JavaScript -->
         </div>
 
-        <div id="weekWrapper" class="week-table-wrapper" aria-hidden="true">
-          <h2 class="section-title">Weekly schedule</h2>
-          <p class="section-subtitle">
-            Regular timings are fixed; changes, if any, will be notified at the hospital.
-          </p>
-
-          <div class="table-responsive">
-            <table aria-label="Weekly consultation time table">
-              <thead>
-                <tr>
-                  <th>Day</th>
-                  <th>Status</th>
-                  <th>Time</th>
-                  <th>Notes</th>
-                </tr>
-              </thead>
-              <tbody id="weekTableBody">
-                <!-- Filled by JavaScript -->
-              </tbody>
-            </table>
+        <div class="legend">
+          <div class="legend-item">
+            <div class="legend-box open"></div>
+            <span>Consultation available</span>
           </div>
-
-          <div class="legend">
-            <span><span class="pill-open">Open</span> Consultation available</span>
-            <span><span class="pill-closed">Closed</span> No consultation</span>
+          <div class="legend-item">
+            <div class="legend-box closed"></div>
+            <span>No consultation</span>
           </div>
         </div>
       </section>
@@ -345,21 +345,15 @@ Made with Perplexity
   </div>
 
   <script>
-    // Configuration: Days when consultation is available (0=Sun, 1=Mon, ..., 6=Sat)
-    // Default schedule: Tue, Wed, Thu, Sat, Sun are open
-    const CONSULT_DAYS = [2, 3, 4, 6, 0]; // Tuesday, Wednesday, Thursday, Saturday, Sunday
-
-    // Time slots for consultation
-    const CONSULT_TIME = "9:00 AM – 2:00 PM";
-
-    // Day names
+    const CONSULT_DAYS = [2, 3, 4, 6, 0];
+    const CONSULT_TIME = "9:00 AM – 1:00 PM";
     const DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     const DAY_NAMES_SHORT = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-    let scheduleOverrides = {}; // Will load from JSON
+    let scheduleOverrides = {};
     let lastUpdated = null;
 
-    // Load overrides from JSON file
     async function loadOverrides() {
       try {
         const response = await fetch('schedule.json?' + Date.now());
@@ -372,7 +366,6 @@ Made with Perplexity
       }
     }
 
-    // Format date as YYYY-MM-DD
     function formatDateLabel(date) {
       const year = date.getFullYear();
       const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -380,36 +373,29 @@ Made with Perplexity
       return `${year}-${month}-${day}`;
     }
 
-    // Format date for display
     function formatDateDisplay(date) {
-      const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-      return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+      return `${MONTH_NAMES[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
     }
 
-    // Check if a specific date is overridden
     function isDayOverridden(dateStr) {
       return scheduleOverrides.hasOwnProperty(dateStr);
     }
 
-    // Check if a day is open for consultation
     function isDayOpen(date) {
       const dateStr = formatDateLabel(date);
       const dayOfWeek = date.getDay();
 
-      // Check if explicitly overridden
       if (isDayOverridden(dateStr)) {
         return scheduleOverrides[dateStr] === 'OPEN';
       }
 
-      // Otherwise use default schedule
       return CONSULT_DAYS.includes(dayOfWeek);
     }
 
-    // Find next N consultation days from a given date
     function findNextConsultDays(fromDate, count) {
       const result = [];
       let cursor = new Date(fromDate.getTime());
-      let maxIterations = 30; // Safety limit
+      let maxIterations = 30;
 
       while (result.length < count && maxIterations > 0) {
         if (isDayOpen(cursor)) {
@@ -421,7 +407,6 @@ Made with Perplexity
       return result;
     }
 
-    // Build the "Next two available days" section
     async function buildNextSlots() {
       const container = document.getElementById('nextSlots');
       const today = new Date();
@@ -468,7 +453,6 @@ Made with Perplexity
         container.appendChild(slotItem);
       });
 
-      // Update last updated time
       const updatedTimeEl = document.getElementById('updatedTime');
       if (lastUpdated) {
         updatedTimeEl.textContent = `Last updated: ${lastUpdated}`;
@@ -477,100 +461,86 @@ Made with Perplexity
       }
     }
 
-    // Build the weekly schedule table
-    function buildWeekTable() {
-      const tbody = document.getElementById('weekTableBody');
-      tbody.innerHTML = '';
+    function buildCalendarGrid() {
+      const container = document.getElementById('calendarGrid');
+      container.innerHTML = '';
 
       const today = new Date();
       today.setHours(0, 0, 0, 0);
+      const todayStr = formatDateLabel(today);
 
-      // Start from current week's Sunday
-      const thisWeekStart = new Date(today);
-      thisWeekStart.setDate(today.getDate() - today.getDay());
+      // Find the end of the week (Saturday)
+      const endOfWeek = new Date(today);
+      const daysUntilSaturday = 6 - today.getDay();
+      endOfWeek.setDate(today.getDate() + daysUntilSaturday);
 
-      for (let dayIndex = 0; dayIndex < 7; dayIndex++) {
-        const date = new Date(thisWeekStart);
-        date.setDate(thisWeekStart.getDate() + dayIndex);
-        const dateStr = formatDateLabel(date);
-        const isOpen = isDayOpen(date);
+      let cursor = new Date(today);
 
-        const row = document.createElement('tr');
-        if (!isOpen) {
-          row.className = 'closed';
+      while (cursor <= endOfWeek) {
+        const dateStr = formatDateLabel(cursor);
+        const isOpen = isDayOpen(cursor);
+        const isToday = dateStr === todayStr;
+        const isOverridden = isDayOverridden(dateStr);
+
+        const dayCard = document.createElement('div');
+        dayCard.className = 'calendar-day';
+        dayCard.className += isOpen ? ' open' : ' closed';
+        if (isToday) dayCard.className += ' today';
+
+        // Override badge
+        if (isOverridden) {
+          const badge = document.createElement('div');
+          badge.className = 'override-badge';
+          badge.textContent = '★';
+          badge.title = 'Schedule modified';
+          dayCard.appendChild(badge);
         }
 
-        // Day column
-        const dayCell = document.createElement('td');
-        dayCell.textContent = DAY_NAMES[dayIndex];
-        row.appendChild(dayCell);
+        // Day name
+        const dayName = document.createElement('div');
+        dayName.className = 'day-name';
+        dayName.textContent = DAY_NAMES[cursor.getDay()];
+        dayCard.appendChild(dayName);
 
-        // Status column
-        const statusCell = document.createElement('td');
-        const statusSpan = document.createElement('span');
-        statusSpan.className = isOpen ? 'pill-open' : 'pill-closed';
-        statusSpan.textContent = isOpen ? 'Open' : 'Closed';
+        // Date number
+        const dayDate = document.createElement('div');
+        dayDate.className = 'day-date';
+        dayDate.textContent = cursor.getDate();
+        dayCard.appendChild(dayDate);
 
-        if (isDayOverridden(dateStr)) {
-          statusSpan.title = `Override: ${scheduleOverrides[dateStr]}`;
+        // Month
+        const dayMonth = document.createElement('div');
+        dayMonth.className = 'day-month';
+        dayMonth.textContent = MONTH_NAMES[cursor.getMonth()];
+        dayCard.appendChild(dayMonth);
+
+        // Status badge
+        const status = document.createElement('div');
+        status.className = 'day-status';
+        status.textContent = isOpen ? 'Available' : 'Closed';
+        dayCard.appendChild(status);
+
+        // Time (only if open)
+        if (isOpen) {
+          const time = document.createElement('div');
+          time.className = 'day-time';
+          time.textContent = CONSULT_TIME;
+          dayCard.appendChild(time);
         }
 
-        statusCell.appendChild(statusSpan);
-        row.appendChild(statusCell);
+        container.appendChild(dayCard);
 
-        // Time column
-        const timeCell = document.createElement('td');
-        timeCell.textContent = isOpen ? CONSULT_TIME : '—';
-        row.appendChild(timeCell);
-
-        // Notes column
-        const notesCell = document.createElement('td');
-        if (isDayOverridden(dateStr)) {
-          notesCell.textContent = 'Schedule modified';
-          notesCell.style.fontStyle = 'italic';
-        } else {
-          notesCell.textContent = '—';
-        }
-        row.appendChild(notesCell);
-
-        tbody.appendChild(row);
+        // Move to next day
+        cursor.setDate(cursor.getDate() + 1);
       }
     }
 
-    // Toggle week view
-    function initToggleWeek() {
-      const btn = document.getElementById('toggleWeekBtn');
-      const wrapper = document.getElementById('weekWrapper');
-      const label = document.getElementById('toggleWeekLabel');
-
-      btn.addEventListener('click', () => {
-        const isExpanded = btn.getAttribute('aria-expanded') === 'true';
-
-        if (isExpanded) {
-          wrapper.classList.remove('open');
-          wrapper.setAttribute('aria-hidden', 'true');
-          btn.setAttribute('aria-expanded', 'false');
-          btn.setAttribute('aria-pressed', 'false');
-          label.textContent = 'Show full week';
-        } else {
-          wrapper.classList.add('open');
-          wrapper.setAttribute('aria-hidden', 'false');
-          btn.setAttribute('aria-expanded', 'true');
-          btn.setAttribute('aria-pressed', 'true');
-          label.textContent = 'Hide full week';
-        }
-      });
-    }
-
-    // Initialize page
     async function initPage() {
       await loadOverrides();
       await buildNextSlots();
-      buildWeekTable();
-      initToggleWeek();
+      buildCalendarGrid();
     }
 
-    // Run on page load
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', initPage);
     } else {
