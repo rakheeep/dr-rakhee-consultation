@@ -1,9 +1,8 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Consultation – Dr. Rakhee E P</title>
+  <title>Out-Patient Consultation – Dr. Rakhee E P</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <style>
@@ -19,6 +18,7 @@
       --open-border: #4caf50;
       --closed-bg: #ffebee;
       --closed-border: #f44336;
+      --info-text: #1976d2;
     }
 
     * {
@@ -40,7 +40,6 @@
     }
 
     header {
-      text-align: center;
       padding: 12px 8px 20px;
       border-bottom: 1px solid var(--border);
       margin-bottom: 16px;
@@ -59,10 +58,15 @@
     }
 
     .availability-note {
-      margin: 8px auto 0;
-      max-width: 520px;
-      font-size: 0.9rem;
-      color: var(--text-muted);
+      margin-top: 12px;
+      font-size: 0.95rem;
+      color: var(--info-text);
+      font-weight: 500;
+      text-align: left;
+      padding: 10px 12px;
+      background: #e3f2fd;
+      border-left: 4px solid var(--info-text);
+      border-radius: 4px;
     }
 
     .card {
@@ -282,9 +286,6 @@
     }
 
     @media (min-width: 600px) {
-      header {
-        text-align: left;
-      }
       .page {
         padding: 24px;
       }
@@ -297,20 +298,20 @@
 <body>
   <div class="page">
     <header>
-      <h1 class="title">Consultation Timings – Dr. Rakhee E P</h1>
+      <h1 class="title">Out-Patient Consultation – Dr. Rakhee E P</h1>
       <p class="subtitle">
         Prasuti and Striroga Specialist, Government Ayurveda Hospital, Palakkad
       </p>
-      <p class="availability-note">
-        View upcoming consultation days for the rest of this week. Available and closed days are color-coded for easy reference.
-      </p>
+      <div class="availability-note">
+        View upcoming out-patient consultation days for the rest of this week. Available and unavailable days are color-coded for easy reference.
+      </div>
     </header>
 
     <main>
       <section class="card" aria-label="Next two available days">
         <h2 class="section-title">Next two available consultations</h2>
         <p class="section-subtitle">
-          These are your upcoming consultation slots.
+          These are your upcoming out-patient consultation slots.
         </p>
         <div id="nextSlots" class="next-slots"></div>
         <div class="updated-time" id="updatedTime">Loading last update...</div>
@@ -329,18 +330,18 @@
         <div class="legend">
           <div class="legend-item">
             <div class="legend-box open"></div>
-            <span>Consultation available</span>
+            <span>Out-patient consultation available</span>
           </div>
           <div class="legend-item">
             <div class="legend-box closed"></div>
-            <span>No consultation</span>
+            <span>Unavailable</span>
           </div>
         </div>
       </section>
     </main>
 
     <footer>
-      Timings are indicative and subject to change as per hospital instructions.
+      Out-patient consultation timings are indicative and subject to change as per hospital instructions.
     </footer>
   </div>
 
@@ -446,7 +447,7 @@
 
         const statusPill = document.createElement('span');
         statusPill.className = 'status-pill';
-        statusPill.textContent = 'Open';
+        statusPill.textContent = 'Available';
 
         slotItem.appendChild(slotMain);
         slotItem.appendChild(statusPill);
@@ -517,7 +518,7 @@
         // Status badge
         const status = document.createElement('div');
         status.className = 'day-status';
-        status.textContent = isOpen ? 'Available' : 'Closed';
+        status.textContent = isOpen ? 'Available' : 'Unavailable';
         dayCard.appendChild(status);
 
         // Time (only if open)
