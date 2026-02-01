@@ -108,12 +108,13 @@ jobs:
             OVERRIDES=$(echo "$OVERRIDES" | jq --arg date "$SUN_DATE" --arg status "${{ github.event.inputs.sun }}" '. + {($date): $status}')
           fi
 
-          # Create schedule.json
+          # Create docs/schedule.json
+          mkdir -p docs
           TODAY=$(date '+%Y-%m-%d')
-          jq -n --argjson overrides "$OVERRIDES" --arg updated "$TODAY" '{overrides: $overrides, last_updated: $updated}' > schedule.json
-
-          echo "Generated schedule.json:"
-          cat schedule.json
+          jq -n --argjson overrides "$OVERRIDES" --arg updated "$TODAY" '{overrides: $overrides, last_updated: $updated}' > docs/schedule.json
+          
+          echo "Generated docs/schedule.json:"
+          cat docs/schedule.json
 
       - name: Commit and push changes
         uses: stefanzweifel/git-auto-commit-action@v5
