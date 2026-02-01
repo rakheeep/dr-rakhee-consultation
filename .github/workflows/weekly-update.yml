@@ -119,4 +119,4 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "📅 Schedule update for week of $(date '+%Y-%m-%d')"
-          file_pattern: schedule.json
+          file_pattern: docs/schedule.json
