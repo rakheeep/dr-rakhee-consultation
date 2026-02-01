@@ -5,6 +5,12 @@ on:
     - cron: '0 9 * * 0'  # Sunday 9AM UTC
   workflow_dispatch:
     inputs:
+      sun:
+        description: 'Sunday (Sun)'
+        required: false
+        default: 'DEFAULT'
+        type: choice
+        options: ['DEFAULT', 'OPEN', 'CLOSED']
       mon:
         description: 'Monday (Mon)'
         required: false
@@ -37,12 +43,6 @@ on:
         options: ['DEFAULT', 'OPEN', 'CLOSED']
       sat:
         description: 'Saturday (Sat)'
-        required: false
-        default: 'DEFAULT'
-        type: choice
-        options: ['DEFAULT', 'OPEN', 'CLOSED']
-      sun:
-        description: 'Sunday (Sun)'
         required: false
         default: 'DEFAULT'
         type: choice
